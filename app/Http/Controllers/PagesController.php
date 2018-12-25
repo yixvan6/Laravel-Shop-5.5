@@ -13,6 +13,8 @@ class PagesController extends Controller
 
     public function emailVerifyNotice(Request $request)
     {
-        return view('pages.email_verify_notice');
+        $msg = $request->msg ?: '请先验证邮箱';
+
+        return view('pages.email_verify_notice', compact('msg'));
     }
 }

@@ -68,4 +68,11 @@ class RegisterController extends Controller
             'password' => bcrypt($data['password']),
         ]);
     }
+
+    protected function redirectTo()
+    {
+        $msg = '验证链接已发送到您的邮箱，请前往查看，30 分钟内有效。若没有收到验证邮件，请点击下方按钮重新发送';
+
+        return route('email_verify_notice', compact('msg'));
+    }
 }
