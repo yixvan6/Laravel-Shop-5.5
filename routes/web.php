@@ -27,5 +27,11 @@ Route::group(['middleware' => 'auth'], function () {
             ->name('user_addresses.create');
         Route::post('user_addresses', 'UserAddressesController@store')
             ->name('user_addresses.store');
+        Route::get('user_addresses/{user_address}/edit', 'UserAddressesController@edit')
+            ->name('user_addresses.edit');
+        Route::put('user_addresses/{user_address}/update', 'UserAddressesController@update')
+            ->name('user_addresses.update');
+        Route::delete('user_addresses/{user_address}', 'UserAddressesController@destroy')
+            ->name('user_addresses.destroy');
     });
 });

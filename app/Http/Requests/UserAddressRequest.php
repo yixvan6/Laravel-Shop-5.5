@@ -16,7 +16,7 @@ class UserAddressRequest extends Request
             'city'          => 'required|string',
             'district'      => 'required|string',
             'address'       => 'required|string',
-            'zip'           => 'integer|length:6',
+            'zip'           => 'digits:6',
             'contact_name'  => 'required|string',
             'contact_phone' => 'required|regex:/^1[34578]\d{9}$/',
         ];
