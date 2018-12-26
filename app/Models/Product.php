@@ -19,4 +19,13 @@ class Product extends Model
     {
         return $this->hasMany(ProductSku::class);
     }
+
+    public function getImageUrlAttribute()
+    {
+        if (starts_with($this->attributes['image'], 'http')) {
+            return $this->attributes['image'];
+        }
+
+        return \Storage::disk('admin')->url($this->attributes['image']);
+    }
 }
