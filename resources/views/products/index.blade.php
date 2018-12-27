@@ -12,7 +12,7 @@
         <input type="text" class="form-control input-sm" name="search" placeholder="搜索">
         <button class="btn btn-primary btn-sm">搜索</button>
         <select name="order" class="form-control input-sm pull-right">
-          <option value="">排序方式</option>
+          <option value="" selected>排序方式</option>
           <option value="price_asc">价格从低到高</option>
           <option value="price_desc">价格从高到低</option>
           <option value="sold_count_desc">销量从高到低</option>
@@ -28,9 +28,15 @@
       <div class="col-xs-3 product-item">
         <div class="product-content">
           <div class="top">
-            <div class="img"><img src="{{ $product->image_url }}" alt=""></div>
+            <div class="img">
+                <a href="{{ route('products.show', $product->id) }}">
+                    <img src="{{ $product->image_url }}" alt="">
+                </a>
+            </div>
             <div class="price"><b>￥</b>{{ $product->price }}</div>
-            <div class="title">{{ $product->title }}</div>
+            <div class="title">
+                <a href="{{ route('products.show', $product->id) }}">{{ $product->title }}</a>
+            </div>
           </div>
           <div class="bottom">
             <div class="sold_count">销量 <span>{{ $product->sold_count }}笔</span></div>
