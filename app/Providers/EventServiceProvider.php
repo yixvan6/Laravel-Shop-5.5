@@ -16,6 +16,10 @@ class EventServiceProvider extends ServiceProvider
         'Illuminate\Auth\Events\Registered' => [
             'App\Listeners\RegisteredListener',
         ],
+        'App\Events\OrderPaid' => [
+            'App\Listeners\UpdateProductSoldCount',
+            'App\Listeners\SendOrderPaidMail',
+        ],
     ];
 
     /**
