@@ -28,21 +28,6 @@ class OrdersController extends Controller
     }
 
     /**
-     * Show interface.
-     *
-     * @param mixed   $id
-     * @param Content $content
-     * @return Content
-     */
-    public function show($id, Content $content)
-    {
-        return $content
-            ->header('Detail')
-            ->description('description')
-            ->body($this->detail($id));
-    }
-
-    /**
      * Edit interface.
      *
      * @param mixed   $id
@@ -92,7 +77,9 @@ class OrdersController extends Controller
         $grid->refund_status('退款状态')->display(function ($value) {
             return Order::$refundStatusMap[$value];
         });
-
+        $grid->closed('订单是否关闭')->display(function ($value) {
+            return $value ? '是' : '否';
+        });
         $grid->disableCreateButton();
         $grid->actions(function ($actions) {
             $actions->disableDelete();
@@ -105,6 +92,12 @@ class OrdersController extends Controller
         });
 
         return $grid;
+    }
+
+    public function show(Order $order, Content $content)
+    {
+        return $content->header('查看订单')
+                        ->body(view('admin.orders.show', ['order' => $order]));
     }
 
     /**
