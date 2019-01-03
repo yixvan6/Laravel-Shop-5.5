@@ -11,6 +11,7 @@ use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Illuminate\Http\Request;
 use App\Exceptions\InvalidRequestException;
+use App\Http\Requests\Admin\HandleRefundRequest;
 
 class OrdersController extends Controller
 {
@@ -128,63 +129,23 @@ class OrdersController extends Controller
         return redirect()->back();
     }
 
-    /**
-     * Make a show builder.
-     *
-     * @param mixed   $id
-     * @return Show
-     */
-    protected function detail($id)
+    public function handleRefund(HandleRefundRequest $request, Order $order)
     {
-        $show = new Show(Order::findOrFail($id));
+        if ($order->refund_status !== Order::REFUND_STATUS_APPLIED) {
+            throw new InvalidRequestException('订单状态错误');
+        }
+        if ($request->agree) {
+            // 同意退款
+        } else {
+            $extra = $order->extra ?: [];
+            $extra['refund_disagree_reason'] = $request->reason;
 
-        $show->id('Id');
-        $show->no('No');
-        $show->user_id('User id');
-        $show->address('Address');
-        $show->total_amount('Total amount');
-        $show->remark('Remark');
-        $show->paid_at('Paid at');
-        $show->payment_method('Payment method');
-        $show->payment_no('Payment no');
-        $show->refund_status('Refund status');
-        $show->refund_no('Refund no');
-        $show->closed('Closed');
-        $show->reviewed('Reviewed');
-        $show->ship_status('Ship status');
-        $show->ship_data('Ship data');
-        $show->extra('Extra');
-        $show->created_at('Created at');
-        $show->updated_at('Updated at');
+            $order->update([
+                'refund_status' => Order::REFUND_STATUS_PENDING,
+                'extra' => $extra,
+            ]);
+        }
 
-        return $show;
-    }
-
-    /**
-     * Make a form builder.
-     *
-     * @return Form
-     */
-    protected function form()
-    {
-        $form = new Form(new Order);
-
-        $form->text('no', 'No');
-        $form->number('user_id', 'User id');
-        $form->textarea('address', 'Address');
-        $form->decimal('total_amount', 'Total amount');
-        $form->textarea('remark', 'Remark');
-        $form->datetime('paid_at', 'Paid at')->default(date('Y-m-d H:i:s'));
-        $form->text('payment_method', 'Payment method');
-        $form->text('payment_no', 'Payment no');
-        $form->text('refund_status', 'Refund status')->default('pending');
-        $form->text('refund_no', 'Refund no');
-        $form->switch('closed', 'Closed');
-        $form->switch('reviewed', 'Reviewed');
-        $form->text('ship_status', 'Ship status')->default('pending');
-        $form->textarea('ship_data', 'Ship data');
-        $form->textarea('extra', 'Extra');
-
-        return $form;
+        return $order;
     }
 }
