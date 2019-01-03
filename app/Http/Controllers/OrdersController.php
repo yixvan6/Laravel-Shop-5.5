@@ -11,6 +11,7 @@ use App\Exceptions\InvalidRequestException;
 use Carbon\Carbon;
 use App\Http\Requests\ReviewRequest;
 use App\Events\OrderReviewed;
+use App\Http\Requests\ApplyRefundRequest;
 
 class OrdersController extends Controller
 {
@@ -94,5 +95,28 @@ class OrdersController extends Controller
         }
 
         return view('orders.review', ['order' => $order->load(['items.productSku', 'items.product'])]);
+    }
+
+    public function applyRefund(ApplyRefundRequest $request, Order $order)
+    {
+        $this->authorize('own', $order);
+
+        if (! $order->paid_at) {
+            throw new InvalidRequestException('订单未支付，不可退款');
+        }
+
+        if ($order->refund_status !== Order::REFUND_STATUS_PENDING) {
+            throw new InvalidRequestException('该订单已申请过退款，请勿重复申请');
+        }
+
+        $extra = $order->extra ?: [];
+        $extra['refund_reason'] = $request->reason;
+
+        $order->update([
+            'refund_status' => Order::REFUND_STATUS_APPLIED,
+            'extra' => $extra,
+        ]);
+
+        return $order;
     }
 }
