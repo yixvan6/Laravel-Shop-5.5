@@ -20,6 +20,10 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\UpdateProductSoldCount',
             'App\Listeners\SendOrderPaidMail',
         ],
+
+        'App\Events\OrderReviewed' => [
+            'App\Listeners\UpdateProductRating',
+        ],
     ];
 
     /**

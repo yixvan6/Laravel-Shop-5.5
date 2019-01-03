@@ -8,6 +8,9 @@ use App\Models\UserAddress;
 use App\Models\Order;
 use App\Services\OrderService;
 use App\Exceptions\InvalidRequestException;
+use Carbon\Carbon;
+use App\Http\Requests\ReviewRequest;
+use App\Events\OrderReviewed;
 
 class OrdersController extends Controller
 {
@@ -49,5 +52,47 @@ class OrdersController extends Controller
         $order->update(['ship_status' => Order::SHIP_STATUS_RECEIVED]);
 
         return $order;
+    }
+
+    public function sendReview(ReviewRequest $request, Order $order)
+    {
+        $this->authorize('own', $order);
+
+        if (! $order->paid_at) {
+            throw new InvalidRequestException('订单未支付，不可评价');
+        }
+
+        if ($order->reviewed) {
+            throw new InvalidRequestException('订单已评价，不可重复提交');
+        }
+
+        $reviews = $request->reviews;
+        \DB::transaction(function () use ($reviews, $order) {
+            foreach ($reviews as $review) {
+                $orderItem = $order->items()->find($review['id']);
+                $orderItem->update([
+                    'rating' => $review['rating'],
+                    'review' => $review['review'],
+                    'reviewed_at' => Carbon::now(),
+                ]);
+            }
+
+            $order->update(['reviewed' => true]);
+
+            event(new OrderReviewed($order));
+        });
+
+        return redirect()->back();
+    }
+
+    public function review(Order $order)
+    {
+        $this->authorize('own', $order);
+
+        if (! $order->paid_at) {
+            throw new InvalidRequestException('该订单未支付，不可评价');
+        }
+
+        return view('orders.review', ['order' => $order->load(['items.productSku', 'items.product'])]);
     }
 }
