@@ -96,4 +96,9 @@ class Order extends Model
 
         return $no;
     }
+
+    public function coupon_code()
+    {
+        return $this->belongsTo(CouponCode::class);
+    }
 }
