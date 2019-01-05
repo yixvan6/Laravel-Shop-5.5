@@ -44,6 +44,10 @@ class CloseOrder implements ShouldQueue
             foreach ($this->order->items as $item) {
                 $item->productSku->addStock($item->amount);
             }
+            // 回退优惠券使用量
+            if ($this->order->coupon_code) {
+                $this->order->coupon_code->changeUsed(false);
+            }
         });
     }
 }

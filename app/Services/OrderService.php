@@ -19,7 +19,7 @@ class OrderService
         // 若有优惠券则先检测
         if ($coupon) {
             // 还没有计算出订单总金额，先不校验
-            $coupon->checkAvailable();
+            $coupon->checkAvailable($user);
         }
 
         $order = \DB::transaction(function () use ($user, $address, $remark, $items, $coupon) {
@@ -60,7 +60,7 @@ class OrderService
             }
 
             if ($coupon) {
-                $coupon->checkAvailable($totalAmount);
+                $coupon->checkAvailable($user, $totalAmount);
                 // 修改优惠后的金额
                 $totalAmount = $coupon->getAdjustedPrice($totalAmount);
                 // 将订单与优惠券关联
