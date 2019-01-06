@@ -10,6 +10,8 @@ $factory->define(App\Models\UserAddress::class, function (Faker $faker) {
         ["江苏省", "苏州市", "相城区"],
         ["广东省", "深圳市", "福田区"],
         ["陕西省", "西安市", "长安区"],
+        ["上海市", "市辖区", "浦东新区"],
+        ["陕西省", "渭南市", "韩城市"],
     ];
     $address = $faker->randomElement($addresses);
 
